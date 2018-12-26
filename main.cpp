@@ -2,7 +2,6 @@
 #include <limits>
 #include "vec3.h"
 #include "ray.h"
-#include "raytracing.h"
 #include "hitable_list.h"
 #include "sphere.h"
 #include "camera.h"
