@@ -17,6 +17,7 @@ typedef camera<double> cameraf;
 typedef material<double> materialf;
 typedef lambertian<double> lambertianf;
 typedef metal<double> metalf;
+typedef dielectric<double> dielectricf;
 
 
 
@@ -49,10 +50,11 @@ int main(int argc, const char * argv[]) {
     cameraf cam;
 
     hitable_listf world;
-    world.push_back(new spheref(vec3f(0.0, 0.0, -1.0), 0.5f, new lambertianf(vec3f(0.8,0.3,0.3))));
-    world.push_back(new spheref(vec3f(1.0, 0.0, -1.0), 0.5f, new metalf(vec3f(0.8,0.8,0.8), 1)));
-    world.push_back(new spheref(vec3f(-1.0, 0.0, -1.0), 0.5f, new metalf(vec3f(0.8,0.6,0.2), 0.3)));
-    world.push_back(new spheref(vec3f(0.0, -100.5, -1.0), 100, new lambertianf(vec3f(0.3,0.8,0.3))));
+    world.push_back(new spheref(vec3f(0.0, 0.0, -1.0), 0.5f, new lambertianf(vec3f(0.1,0.2,0.5))));
+    world.push_back(new spheref(vec3f(1.0, 0.0, -1.0), 0.5f, new metalf(vec3f(0.8,0.6,0.2), 0.5)));
+    world.push_back(new spheref(vec3f(-1.0, 0.0, -1.0), 0.5f, new dielectricf(1.5)));
+    world.push_back(new spheref(vec3f(-1.0, 0.0, -1.0), -0.45f, new dielectricf(1.5)));
+    world.push_back(new spheref(vec3f(0.0, -100.5, -1.0), 100, new lambertianf(vec3f(0.8,0.8,0.0))));
 
     for (int j=ny-1; j>=0; j--) {
         for (int i=0; i<nx; i++) {

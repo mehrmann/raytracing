@@ -4,6 +4,7 @@
 #include "vec3.h"
 #include "ray.h"
 #include "hitable.h"
+#include "util.h"
 
 template <typename T>
 class material {
@@ -45,4 +46,43 @@ public:
     vec3<T> albedo;
     T fuzz;
 };
+
+template <typename T>
+class dielectric : public material<T> {
+public:
+    dielectric(T ri) : ref_idx(ri) {}
+    virtual bool scatter(const ray<T>& ray_in, const hit_record<T>& rec, vec3<T>& attenuation, ray<T>& scattered) const {
+        vec3<T> outward_normal;
+        vec3<T> reflected = reflect(unitVector(ray_in.direction()), rec.normal);
+        T ni_over_nt;
+        attenuation = vec3<T>(1.0, 1.0, 1.0);
+        vec3<T> refracted;
+        T reflect_prob;
+        T cosine;
+        if (dot(ray_in.direction(), rec.normal) > 0) {
+            outward_normal = -rec.normal;
+            ni_over_nt = ref_idx;
+            cosine = ref_idx * dot(ray_in.direction(), rec.normal) / ray_in.direction().length();
+        } else {    
+            outward_normal = rec.normal;
+            ni_over_nt = 1.0 / ref_idx;
+            cosine = -dot(ray_in.direction(), rec.normal) / ray_in.direction().length();
+        }
+        if (refract(ray_in.direction(), outward_normal, ni_over_nt, refracted)) {
+            reflect_prob = schlick(cosine, ref_idx);
+        } else {
+            scattered = ray<T>(rec.p, reflected);
+            reflect_prob = 1.0;
+        }
+        if (drand48() < reflect_prob) {
+            scattered = ray<T>(rec.p, reflected);
+        } else {
+            scattered = ray<T>(rec.p, refracted);
+        }
+        return true;
+    }
+
+    T ref_idx;
+};
+
 #endif

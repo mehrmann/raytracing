@@ -202,21 +202,4 @@ vec3<T> randomInUnitSphere() {
     return p;
 }
 
-/**
- * \     /|
- *  \v r/ | B
- *   \ /  |
- *  --*-----
- *     \  |
- *      \v| B
- *       \|
- * 
- * length of B = dot(v,n)
- * direction of B is n
- */
-template <typename T>
-vec3<T> reflect(const vec3<T>& v, const vec3<T>& n) {
-    return v - 2*dot(v,n) * n;
-}
-
 #endif
