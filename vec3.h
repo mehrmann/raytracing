@@ -43,6 +43,12 @@ template <typename T> class vec3 {
     }
 
     inline void makeUnitVector();
+
+    inline vec3<T> apply(T (*f)(const T& t)) {
+        e[0] = f(e[0]);
+        e[1] = f(e[1]);
+        e[2] = f(e[2]);
+    }
     
     T e[3];
 };
@@ -185,6 +191,32 @@ inline vec3<T> unitVector(const vec3<T>& v) {
 template <typename T>
 inline vec3<T> lerp(const vec3<T>& v1, const vec3<T>& v2, T t) {
     return (T)(1.0-t) * v1 + t * v2;
+}
+
+template <typename T>
+vec3<T> randomInUnitSphere() {
+    vec3<T> p;
+    do {
+        p = 2.0 * vec3<T>(drand48(), drand48(), drand48()) - vec3<T>(1,1,1);
+    } while (p.squaredLength() >= 1.0);
+    return p;
+}
+
+/**
+ * \     /|
+ *  \v r/ | B
+ *   \ /  |
+ *  --*-----
+ *     \  |
+ *      \v| B
+ *       \|
+ * 
+ * length of B = dot(v,n)
+ * direction of B is n
+ */
+template <typename T>
+vec3<T> reflect(const vec3<T>& v, const vec3<T>& n) {
+    return v - 2*dot(v,n) * n;
 }
 
 #endif

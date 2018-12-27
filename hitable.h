@@ -4,11 +4,14 @@
 #include "vec3.h"
 #include "ray.h"
 
+template <typename T> class material;
+
 template <typename T>
 struct hit_record {
     T t;
     vec3<T> p;
     vec3<T> normal;
+    material<T> *material;
 };
 
 template <typename T>
