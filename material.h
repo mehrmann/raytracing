@@ -28,14 +28,21 @@ public:
 template <typename T>
 class metal : public material<T> {
 public:
-    metal(vec3<T> a) : albedo(a) {}
+    metal(vec3<T> a, T f) : albedo(a) { 
+        if (f < 1) {
+            fuzz = f;
+        } else {
+            fuzz = 1;
+        }
+    }
     virtual bool scatter(const ray<T>& ray_in, const hit_record<T>& rec, vec3<T>& attenuation, ray<T>& scattered) const {
         vec3<T> reflected = reflect(unitVector(ray_in.direction()), rec.normal);
-        scattered = ray<T>(rec.p, reflected);
+        scattered = ray<T>(rec.p, reflected + fuzz * randomInUnitSphere<T>());
         attenuation = albedo;
         return (dot(scattered.direction(), rec.normal) > 0);
     }
     
     vec3<T> albedo;
+    T fuzz;
 };
 #endif

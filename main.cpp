@@ -43,14 +43,15 @@ vec3f color(const hitable_listf& world, const rayf& r, int depth) {
 int main(int argc, const char * argv[]) {
     int nx = 200;
     int ny = 100;
-    int ns = 16;
+    int ns = 100;
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 
     cameraf cam;
 
     hitable_listf world;
     world.push_back(new spheref(vec3f(0.0, 0.0, -1.0), 0.5f, new lambertianf(vec3f(0.8,0.3,0.3))));
-    world.push_back(new spheref(vec3f(1.0, 0.0, -1.0), 0.5f, new metalf(vec3f(0.8,0.8,0.8))));
+    world.push_back(new spheref(vec3f(1.0, 0.0, -1.0), 0.5f, new metalf(vec3f(0.8,0.8,0.8), 1)));
+    world.push_back(new spheref(vec3f(-1.0, 0.0, -1.0), 0.5f, new metalf(vec3f(0.8,0.6,0.2), 0.3)));
     world.push_back(new spheref(vec3f(0.0, -100.5, -1.0), 100, new lambertianf(vec3f(0.3,0.8,0.3))));
 
     for (int j=ny-1; j>=0; j--) {
