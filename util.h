@@ -40,4 +40,27 @@ T schlick(T cosine, T ref_idx) {
     return r0 + (1-r0)*pow((1-cosine), 5);
 }
 
+template <typename T>
+vec3<T> randomInUnitSphere() {
+    vec3<T> p;
+    do {
+        p = (T)2.0 * vec3<T>(drand48(), drand48(), drand48()) - vec3<T>(1,1,1);
+    } while (p.squaredLength() >= 1.0);
+    return p;
+}
+
+template <typename T>
+vec3<T> randomInUnitDisk() {
+    vec3<T> p;
+    do {
+        p = (T)2.0 * vec3<T>(drand48(), drand48(), 0) - vec3<T>(1,1,0);
+    } while (dot(p,p) >= 1.0);
+    return p;
+}
+
+template <typename X, typename T>
+inline X lerp(const X& x1, const X& x2, T t) {
+    return (T)(1.0-t) * x1 + t * x2;
+}
+
 #endif
