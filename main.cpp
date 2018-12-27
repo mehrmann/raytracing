@@ -14,12 +14,24 @@ typedef hit_record<double> hit_recordf;
 typedef hitable_list<double> hitable_listf;
 typedef camera<double> cameraf;
 
+vec3f randomInUnitSphere() {
+    vec3f p;
+    do {
+        p = 2.0 * vec3f(drand48(), drand48(), drand48()) - vec3f(1,1,1);
+    } while (p.squaredLength() >= 1.0);
+    return p;
+}
+
 vec3f color(const hitable_listf& world, const rayf& r) {
     hit_recordf rec;
 
-    if (world.hit(r, 0.0, std::numeric_limits<double>::max(), rec)) {
-        return 0.5 * (rec.normal + vec3f(1.0, 1.0, 1.0));
+    if (world.hit(r, 0.001, std::numeric_limits<double>::max(), rec)) {
+        //bounce
+        vec3f target = rec.p + rec.normal + randomInUnitSphere();
+        //follow the ray, absorb 50%
+        return 0.5 * color( world, rayf(rec.p, target - rec.p));
     } else {
+        //didn't hit any object
         vec3f unitDirection = unitVector(r.direction());
         double t = 0.5 * (unitDirection.y() + 1.0);
         return lerp(vec3f(1.0,1.0,1.0), vec3f(0.5,0.7,1.0), t);
@@ -46,7 +58,11 @@ int main(int argc, const char * argv[]) {
                 double v = double(j + drand48() ) / double(ny);
                 col += color(world, cam.getRay(u, v));
             }
+            //multisampling correction
             col /= ns;
+            //gamma correction
+            col = vec3f(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
+            
             col *= 255.99;
             std::cout << (int)col.r() << " " << (int)col.g() << " " << (int)col.b() << "\n";
         }
