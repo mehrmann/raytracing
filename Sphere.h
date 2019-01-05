@@ -1,26 +1,25 @@
 #ifndef SPHEREH
 #define SPHEREH
 
-#include "vec3.h"
-#include "ray.h"
-#include "hitable.h"
+#include "Vec3.h"
+#include "Ray.h"
+#include "Object.h"
 
-template<class T>
-class sphere : public hitable<T> {
+class Sphere : public Object {
 public:
-    sphere() {}
-    sphere(const vec3<T>& cen, T r, material<T>* m) : center(cen), radius(r), material(m) {}
-    virtual bool hit(const ray<T>& r, T t_min, T t_max, hit_record<T>& rec) const;
+    Sphere() {}
+    Sphere(const Vec3& cen, float r, std::shared_ptr<Material> m) : center(cen), radius(r), material(m) {}
+    virtual bool hit(const Ray& r, float t_min, float t_max, Hit& rec) const;
 
-    vec3<T> center;
-    T radius;
-    material<T> *material;
+    Vec3 center;
+    float radius;
+    std::shared_ptr<Material> material;
 };
 
 /**
- * ray intersects with sphere when:
- * O = ray.origin()
- * D = ray.direction()
+ * Ray intersects with Sphere when:
+ * O = Ray.origin()
+ * D = Ray.direction()
  * C = center()
  * r = radius
  * 
@@ -35,18 +34,17 @@ public:
  * we can leave out some 2's
  * 
  */
-template <typename T>
-bool sphere<T>::hit(const ray<T>& ray, T t_min, T t_max, hit_record<T>& rec) const {
-    vec3<T> oc = ray.origin() - center;
-    float a = dot(ray.direction(), ray.direction());
-    float b = dot(oc, ray.direction());
+bool Sphere::hit(const Ray& Ray, float t_min, float t_max, Hit& rec) const {
+    Vec3 oc = Ray.origin() - center;
+    float a = dot(Ray.direction(), Ray.direction());
+    float b = dot(oc, Ray.direction());
     float c = dot(oc, oc) - radius * radius;
     float discriminant = b*b - a*c;
     if (discriminant > 0) {
         float temp = (-b - sqrt(discriminant) ) / a;
         if (temp < t_max && temp > t_min) {
             rec.t = temp;
-            rec.p = ray.pointAtParameter(rec.t);
+            rec.p = Ray.pointAtParameter(rec.t);
             rec.normal = (rec.p - center) / radius;
             rec.material = material;
             return true;
@@ -54,7 +52,7 @@ bool sphere<T>::hit(const ray<T>& ray, T t_min, T t_max, hit_record<T>& rec) con
         temp = (-b + sqrt(discriminant) ) / a;
         if (temp < t_max && temp > t_min) {
             rec.t = temp;
-            rec.p = ray.pointAtParameter(rec.t);
+            rec.p = Ray.pointAtParameter(rec.t);
             rec.normal = (rec.p - center) / radius;
             rec.material = material;
             return true;
