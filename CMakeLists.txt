@@ -9,4 +9,5 @@ set(SOURCE main.cpp)
 set(CMAKE_CXX_FLAGS "-stdlib=libc++ -std=gnu++11")
 
 add_executable(${PROJECT_NAME} ${SOURCE})
-target_link_libraries(${PROJECT_NAME} ${FLTK_LIBRARIES})
+include_directories(${FLTK_INCLUDE_DIR})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${FLTK_LIBRARIES})

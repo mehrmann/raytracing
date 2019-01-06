@@ -50,13 +50,13 @@ void createSpheres(ObjectList& world) {
 }
 
    
-void trace(const ObjectList& world, std::shared_ptr<Vec3> rawData, std::shared_ptr<unsigned char> pixels, int nx, int ny, int startX, int endX, int startY, int endY) {
-    int ns = 256;
+void trace(const ObjectList& world, std::shared_ptr<Vec3> rawData, std::shared_ptr<unsigned char> pixels, int nx, int ny, int ns, int startX, int endX, int startY, int endY) {
+    
 
     Vec3 lookFrom(6, 1.5, 2);
     Vec3 lookAt(0,0.5,-1);
     float distToFocus = (lookFrom - lookAt).length();
-    float aperture = 0.5;
+    float aperture = 0.05;
     Camera cam(lookFrom, lookAt, Vec3(0,1,0), 20, nx/ny, aperture, distToFocus);
 
     for (int s=0; s<ns; s++) {
@@ -82,13 +82,15 @@ void trace(const ObjectList& world, std::shared_ptr<Vec3> rawData, std::shared_p
 
 int main(int argc, const char * argv[]) {
     
-    int nx = 400;
-    int ny = 200;
+    int nx = 800;
+    int ny = 400;
+    int ns = 128;
+
     std::shared_ptr<unsigned char> pixels(new unsigned char[nx * ny * 3], std::default_delete<unsigned char[]>());
     std::shared_ptr<Vec3> rawData(new Vec3[nx*ny]);
  
     ObjectList world;
-    //createSpheres(world);
+    createSpheres(world);
     world.push_back(std::make_shared<Sphere>(Vec3(0.0, 0.4, -0.0), 0.4f, std::make_shared<Lambert>(Vec3(0.1,0.2,0.5))));
     world.push_back(std::make_shared<Sphere>(Vec3(0.0, 1.6, -1.0), 0.4f, std::make_shared<Lambert>(Vec3(0.5,0.2,0.1))));
     world.push_back(std::make_shared<Sphere>(Vec3(0.0, 0.8, -2.0), 0.4f, std::make_shared<Lambert>(Vec3(0.1,0.5,0.2))));
@@ -100,15 +102,28 @@ int main(int argc, const char * argv[]) {
     std::list< std::thread > threads;
     int sliceWidth = nx/numThreads;
     for (int t=0; t<numThreads; t++) {
-        threads.push_back(std::thread(trace, world, rawData, pixels, nx, ny, t * sliceWidth , (t+1)*sliceWidth, 0, ny));
+        threads.push_back(std::thread(trace, world, rawData, pixels, nx, ny, ns, t * sliceWidth , (t+1)*sliceWidth, 0, ny));
     }
     
     showWindow(pixels, nx, ny);
 
     for(std::thread& thread : threads)
     {
-       thread.join(); 
+       if (thread.joinable()) thread.join(); 
     }
+
+    std::cout << "P3\n" << nx << " " << ny << "\n255\n";
+    for (int y=ny-1; y>=0; y--) {
+        for(int x=0; x<nx; x++) {
+            Vec3 col = rawData.get()[y*nx + x] / ns;
+            //gamma correction
+            col = Vec3(sqrt(col.r), sqrt(col.g), sqrt(col.b));
+            col *= 255.99;
+            std::cout << (int)col.r << " " << (int)col.g << " " << (int)col.b << "\n";
+        }
+    }
+    
+    std::cerr << "finished.";
 
     return 0;
 }
