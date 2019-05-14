@@ -12,3 +12,5 @@ matrix:
         - sudo apt-get install libfltk1.3-dev fluid libxinerama-dev freeglut3 freeglut3-dev libglew1.5 libglew1.5-dev libglu1-mesa libglu1-mesa-dev libgl1-mesa-glx libgl1-mesa-dev
     - os: osx
       osx_image: xcode10.2
+      before_install:
+        - brew install fltkwithcairo
