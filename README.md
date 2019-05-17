@@ -1,6 +1,8 @@
 # raytracing
 A simple ray tracer
 
+[![Build Status](https://travis-ci.com/mehrmann/raytracing.svg?branch=master)](https://travis-ci.com/mehrmann/raytracing)
+
 ![result](result.png)
 
 
